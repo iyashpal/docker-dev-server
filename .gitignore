@@ -1,0 +1,11 @@
+# Ignore environment file
+.env
+
+# Ignore all nginx config files except default.conf
+.docker/nginx/conf.d/*.conf
+!.docker/nginx/conf.d/default.conf
+
+
+# Ignore html files
+html/*
+!html/index.php
