@@ -8,7 +8,7 @@ services:
   nginx:
     container_name: ${CONTAINER_PREFIX:-docker}-nginx
     
-    restart: unless-stopped
+    restart: always
     
     build:
       context: .docker
@@ -61,8 +61,8 @@ services:
       context: .docker
       dockerfile: mysql.dockerfile
 
-    # ports:
-    #   - 3306:3306
+    ports:
+      - ${MYSQL_FORWARD_DB_PORT:-3306}:3306
 
     volumes:
       - ${CONTEXT_PATH:-./.docker}/mysql/data:/var/lib/mysql
