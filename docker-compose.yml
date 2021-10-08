@@ -8,7 +8,7 @@ services:
   nginx:
     container_name: ${CONTAINER_PREFIX:-docker}-nginx
     
-    restart: always
+    # restart: always
     
     build:
       context: .docker
@@ -87,7 +87,7 @@ services:
       context: .docker
       dockerfile: redis.dockerfile
 
-    restart: unless-stopped
+    # restart: unless-stopped
 
     ports:
       - "${FORWARD_REDIS_PORT:-6379}:6379"
