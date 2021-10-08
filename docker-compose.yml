@@ -14,15 +14,15 @@ services:
       context: .docker
       dockerfile: nginx.dockerfile
 
+    volumes:
+      - "./.docker/nginx/conf.d:/etc/nginx/conf.d"
+      - "./.docker/nginx/logs:/var/log/nginx"
+      - "${PUBLIC_ROOT_PATH:-./html}:/var/www/html"
+
     ports:
       - "${NGINX_FORWARD_SSL_PORT:-443}:443"
       - "${NGINX_FORWARD_HOST_PORT:-80}:80"
     
-    volumes:
-      - ${CONTEXT_PATH:-./.docker}/nginx/conf.d:/etc/nginx/conf.d
-      - ${CONTEXT_PATH:-./.docker}/nginx/logs:/var/log/nginx
-      - ${PUBLIC_ROOT_PATH:-./html}:/var/www/html
-
     depends_on:
       - php
       - mysql
@@ -32,8 +32,8 @@ services:
       - "${CONTAINER_PREFIX:-docker}-php:php"
       - "${CONTAINER_PREFIX:-docker}-mysql:mysql"
     
-    network_mode: ${NETWORKS:-bridge}
-
+    networks:
+      - DevServer
 
   # *******************************************
   #     PHP FPM Service Container
@@ -46,10 +46,13 @@ services:
       dockerfile: php.dockerfile
     
     volumes:
-      - ${PUBLIC_ROOT_PATH:-./html}:/var/www/html
+      - "${PUBLIC_ROOT_PATH:-./html}:/var/www/html"
 
-    network_mode: ${NETWORKS:-bridge}
+    ports:
+      - "9000:9000"
 
+    networks:
+      - DevServer
 
   # *******************************************
   #     MYSQL Service Container
@@ -62,12 +65,43 @@ services:
       dockerfile: mysql.dockerfile
 
     ports:
-      - ${MYSQL_FORWARD_DB_PORT:-3306}:3306
+      - "${MYSQL_FORWARD_DB_PORT:-3306}:3306"
 
     volumes:
-      - ${CONTEXT_PATH:-./.docker}/mysql/data:/var/lib/mysql
+      - "./.docker/mysql/data:/var/lib/mysql"
 
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-secret}
 
-    network_mode: ${NETWORKS:-bridge}
+    networks:
+      - DevServer
+
+
+  # *******************************************
+  #     REDIS Service Container
+  # *******************************************
+  redis:
+    container_name: ${CONTAINER_PREFIX:-docker}-redis
+    
+    build:
+      context: .docker
+      dockerfile: redis.dockerfile
+
+    restart: unless-stopped
+
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379"
+
+    volumes:
+      - "./.docker/redis/data:/data"
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+    
+    networks:
+      - DevServer
+
+
+networks:
+    DevServer:
+        driver: bridge
