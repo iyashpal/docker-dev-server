@@ -8,7 +8,7 @@ services:
   nginx:
     container_name: ${CONTAINER_PREFIX:-docker}-nginx
     
-    restart: always
+    restart: unless-stopped
     
     build:
       context: .docker
@@ -41,6 +41,8 @@ services:
   php:
     container_name: ${CONTAINER_PREFIX:-docker}-php
 
+    restart: unless-stopped
+
     build:
       context: .docker
       dockerfile: php.dockerfile
@@ -59,6 +61,8 @@ services:
   # *******************************************
   mysql:
     container_name: ${CONTAINER_PREFIX:-docker}-mysql
+
+    restart: unless-stopped
 
     build:
       context: .docker
