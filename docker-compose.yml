@@ -73,6 +73,7 @@ services:
 
     volumes:
       - "./.docker/mysql/data:/var/lib/mysql"
+      - "./.docker/mysql/conf.d:/etc/mysql/conf.d"
 
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-secret}
