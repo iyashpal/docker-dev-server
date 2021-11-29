@@ -29,8 +29,8 @@ services:
 
     external_links:
       # Programming Language Containers
-      - "${CONTAINER_PREFIX:-docker}-php:php"
-      - "${CONTAINER_PREFIX:-docker}-mysql:mysql"
+      - "${CONTAINER_PREFIX:-docker}-php:docker_php"
+      - "${CONTAINER_PREFIX:-docker}-mysql:docker_mysql"
     
     networks:
       - DevServer
