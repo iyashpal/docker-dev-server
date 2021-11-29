@@ -24,15 +24,15 @@ services:
       - "${NGINX_FORWARD_HOST_PORT:-80}:80"
 
     depends_on:
-      - local_php
-      - local_mysql
-      - local_redis
+      - docker_php
+      - docker_mysql
+      - docker_redis
 
     external_links:
       # Programming Language Containers
-      - "${CONTAINER_PREFIX:-docker}-php:local_php"
-      - "${CONTAINER_PREFIX:-docker}-mysql:local_mysql"
-      - "${CONTAINER_PREFIX:-docker}-redis:local_redis"
+      - "${CONTAINER_PREFIX:-docker}-php:docker_php"
+      - "${CONTAINER_PREFIX:-docker}-mysql:docker_mysql"
+      - "${CONTAINER_PREFIX:-docker}-redis:docker_redis"
 
 
     networks:
