@@ -4,6 +4,7 @@
 # Ignore all nginx config files except default.conf
 .docker/nginx/conf.d/*.conf
 !.docker/nginx/conf.d/default.conf
+!.docker/nginx/conf.d/laravel-default.conf
 
 
 # Ignore html files
