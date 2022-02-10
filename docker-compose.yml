@@ -122,4 +122,3 @@ networks:
 
 volumes:
   postgresql:
-    external: true
