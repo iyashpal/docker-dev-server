@@ -2,10 +2,7 @@ version: "3.9"
 
 services:
 
-  # *******************************************
-  #     Nginx Service Container
-  # *******************************************
-  nginx:
+  webserver:
     container_name: ${CONTAINER_PREFIX:-docker}-nginx
 
     restart: always
@@ -15,13 +12,13 @@ services:
       dockerfile: nginx.dockerfile
 
     volumes:
-      - "./.docker/nginx/conf.d:/etc/nginx/conf.d"
       - "./.docker/nginx/logs:/var/log/nginx"
+      - "./.docker/nginx/conf.d:/etc/nginx/conf.d"
       - "${PUBLIC_ROOT_PATH:-./html}:/var/www/html"
 
     ports:
-      - "${NGINX_FORWARD_SSL_PORT:-443}:443"
       - "${NGINX_FORWARD_HOST_PORT:-80}:80"
+      - "${NGINX_FORWARD_SSL_PORT:-443}:443"
 
     depends_on:
       - docker_php
@@ -34,13 +31,9 @@ services:
       - "${CONTAINER_PREFIX:-docker}-mysql:docker_mysql"
       - "${CONTAINER_PREFIX:-docker}-redis:docker_redis"
 
-
     networks:
-      - DevServer
+      - WebServer
 
-  # *******************************************
-  #     PHP FPM Service Container
-  # *******************************************
   php:
     container_name: ${CONTAINER_PREFIX:-docker}-php
 
@@ -57,11 +50,8 @@ services:
       - "9000:9000"
 
     networks:
-      - DevServer
+      - WebServer
 
-  # *******************************************
-  #     MYSQL Service Container
-  # *******************************************
   mysql:
     container_name: ${CONTAINER_PREFIX:-docker}-mysql
 
@@ -70,6 +60,8 @@ services:
     build:
       context: .docker
       dockerfile: mysql.dockerfile
+
+    command: --default-authentication-plugin=mysql_native_password
 
     ports:
       - "${MYSQL_FORWARD_DB_PORT:-3306}:3306"
@@ -82,11 +74,27 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
 
     networks:
-      - DevServer
+      - WebServer
 
-  # *******************************************
-  #     REDIS Service Container
-  # *******************************************
+  postgresql:
+    container_name: "${CONTAINER_PREFIX:-docker}-postgresql"
+
+    build:
+      context: .docker
+      dockerfile: postgresql.dockerfile
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+
+    ports:
+      - "${PGSQL_FORWARD_DB_PORT:-5432}:5432"
+
   redis:
     container_name: ${CONTAINER_PREFIX:-docker}-redis
 
@@ -106,8 +114,12 @@ services:
       test: [ "CMD", "redis-cli", "ping" ]
 
     networks:
-      - DevServer
+      - WebServer
 
 networks:
-  DevServer:
+  WebServer:
     driver: "${NETWORKS:-bridge}"
+
+volumes:
+  postgresql:
+    external: true
