@@ -8,8 +8,8 @@ services:
     restart: always
 
     build:
-      context: .docker
-      dockerfile: nginx.dockerfile
+      context: .docker/nginx
+      dockerfile: Dockerfile
 
     volumes:
       - "./.docker/nginx/logs:/var/log/nginx"
@@ -28,6 +28,7 @@ services:
     external_links:
       # Programming Language Containers
       - "${CONTAINER_PREFIX:-docker}-php:docker_php"
+      - "${CONTAINER_PREFIX:-docker}-php-71:docker_php_71"
       - "${CONTAINER_PREFIX:-docker}-mysql:docker_mysql"
       - "${CONTAINER_PREFIX:-docker}-redis:docker_redis"
 
@@ -40,8 +41,8 @@ services:
     restart: unless-stopped
 
     build:
-      context: .docker
-      dockerfile: php.dockerfile
+      context: .docker/php
+      dockerfile: Dockerfile
 
     volumes:
       - "${PUBLIC_ROOT_PATH:-./html}:/var/www/html"
@@ -52,14 +53,30 @@ services:
     networks:
       - WebServer
 
+  php_71:
+    container_name: ${CONTAINER_PREFIX:-docker}-php-71
+
+    build:
+      context: .docker/php/7.1
+      dockerfile: Dockerfile
+
+    volumes:
+      - "${PUBLIC_ROOT_PATH:-./html}:/var/www/html"
+
+    ports:
+      - "9001:9000"
+
+    networks:
+      - WebServer
+
   mysql:
     container_name: ${CONTAINER_PREFIX:-docker}-mysql
 
     restart: unless-stopped
 
     build:
-      context: .docker
-      dockerfile: mysql.dockerfile
+      context: .docker/mysql
+      dockerfile: Dockerfile
 
     command: --default-authentication-plugin=mysql_native_password
 
@@ -67,8 +84,8 @@ services:
       - "${MYSQL_FORWARD_DB_PORT:-3306}:3306"
 
     volumes:
-      - "./.docker/mysql/data:/var/lib/mysql"
       - "./.docker/mysql/conf.d:/etc/mysql/conf.d"
+      - mysql:/var/lib/mysql
 
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
@@ -80,8 +97,8 @@ services:
     container_name: "${CONTAINER_PREFIX:-docker}-postgresql"
 
     build:
-      context: .docker
-      dockerfile: postgresql.dockerfile
+      context: .docker/postgresql
+      dockerfile: Dockerfile
 
     restart: unless-stopped
 
@@ -122,3 +139,4 @@ networks:
 
 volumes:
   postgresql:
+  mysql:
