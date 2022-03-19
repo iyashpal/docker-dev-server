@@ -14,6 +14,7 @@ services:
     volumes:
       - "./.docker/nginx/logs:/var/log/nginx"
       - "./.docker/nginx/conf.d:/etc/nginx/conf.d"
+      - "./.docker/nginx/ssl:/etc/nginx/ssl"
       - "${PUBLIC_ROOT_PATH:-./html}:/var/www/html"
 
     ports:
