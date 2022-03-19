@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
 
-  webserver:
+  nginx:
     container_name: ${CONTAINER_PREFIX:-docker}-nginx
 
     restart: always
@@ -35,13 +35,13 @@ services:
     networks:
       - WebServer
 
-  php:
+  php_latest:
     container_name: ${CONTAINER_PREFIX:-docker}-php
 
     restart: unless-stopped
 
     build:
-      context: .docker/php
+      context: .docker/php/latest
       dockerfile: Dockerfile
 
     volumes:
@@ -69,13 +69,13 @@ services:
     networks:
       - WebServer
 
-  mysql:
+  mysql_latest:
     container_name: ${CONTAINER_PREFIX:-docker}-mysql
 
     restart: unless-stopped
 
     build:
-      context: .docker/mysql
+      context: .docker/mysql/latest
       dockerfile: Dockerfile
 
     command: --default-authentication-plugin=mysql_native_password
@@ -93,11 +93,11 @@ services:
     networks:
       - WebServer
 
-  postgresql:
+  postgresql_latest:
     container_name: "${CONTAINER_PREFIX:-docker}-postgresql"
 
     build:
-      context: .docker/postgresql
+      context: .docker/postgresql/latest
       dockerfile: Dockerfile
 
     restart: unless-stopped
@@ -112,12 +112,12 @@ services:
     ports:
       - "${PGSQL_FORWARD_DB_PORT:-5432}:5432"
 
-  redis:
+  redis_latest:
     container_name: ${CONTAINER_PREFIX:-docker}-redis
 
     build:
-      context: .docker
-      dockerfile: redis.dockerfile
+      context: .docker/redis/latest
+      dockerfile: Dockerfile
 
     restart: unless-stopped
 
@@ -125,7 +125,7 @@ services:
       - "${FORWARD_REDIS_PORT:-6379}:6379"
 
     volumes:
-      - "./.docker/redis/data:/data"
+      - redis:/data
 
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
@@ -140,3 +140,4 @@ networks:
 volumes:
   postgresql:
   mysql:
+  redis:

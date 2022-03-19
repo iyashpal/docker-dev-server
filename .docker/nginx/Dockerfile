@@ -6,7 +6,7 @@ ENV NGINX_GROUP=docker
 
 RUN mkdir -p /var/www/html
 
-ADD nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+ADD conf.d/default.conf /etc/nginx/conf.d/default.conf
 
 RUN sed -i "s/user www-data/user ${NGINX_USER}/g" /etc/nginx/nginx.conf
 
