@@ -57,6 +57,8 @@ services:
   php_71:
     container_name: ${CONTAINER_PREFIX:-docker}-php-71
 
+    restart: always
+
     build:
       context: .docker/php/7.1
       dockerfile: Dockerfile
