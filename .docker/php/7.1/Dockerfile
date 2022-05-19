@@ -16,6 +16,6 @@ RUN apk add --no-cache zip libzip-dev
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql zip
 
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2.2 /usr/bin/composer /usr/local/bin/composer
 
 CMD ["php-fpm", "-y", "/usr/local/etc/php-fpm.conf", "-R"]
